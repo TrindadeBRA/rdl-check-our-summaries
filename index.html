@@ -80,7 +80,8 @@
 
                     // console.log(">>>", data.posts)
                     const blockComponent = document.getElementById('block-books');
-
+                    blockComponent.innerHTML = '';
+                    
                     data.posts.forEach(post => {
                         const postDiv = document.createElement('div');
 
@@ -112,6 +113,5 @@
                     console.error('Erro:', error);
                 });
         }
-        submitForm();
     </script>
 </div>
