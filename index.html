@@ -77,7 +77,7 @@
 
     <script>
         function removeAccents(str) {
-            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            return str.normalize("NFD").replace(/[\u0300-\u036f|\u00b4|\u0060|\u005e|\u007e]/g, "");
         }
 
         function submitForm() {
@@ -100,7 +100,8 @@
                     const searchInput = document.getElementById('search');
 
                     searchInput.addEventListener('input', function () {
-                        const searchTerm = this.value.toLowerCase();
+                        const searchTerm = removeAccents(this.value.toLowerCase());
+                        // console.log(">>>", searchTerm)
 
                         const filteredPosts = data.posts.filter(post => {
                             const bookName = removeAccents(post.book_name.toLowerCase());
