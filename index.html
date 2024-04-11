@@ -28,20 +28,20 @@
         margin: 12px;
     }
 
-    .post-item a{
+    .post-item a {
         text-decoration: none !important;
     }
 
     .post-item .book-title {
         text-align: center;
         font-size: 12px;
-        color: #000!important;
+        color: #000 !important;
         text-decoration: none;
         padding: 12px 6px;
     }
 
     .dark .post-item .book-title {
-        color: #fff!important;
+        color: #fff !important;
     }
 
     @media only screen and (min-width: 769px) {
@@ -60,10 +60,15 @@
 
 <div>
     <div id="block-component">
+        <input type="text" name="search" id="search" placeholder="Pesquisar...">
         <div id="block-books"></div>
     </div>
 
     <script>
+        function removeAccents(str) {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        }
+
         function submitForm() {
             const endpoinAPI = 'https://cms.resumodolivro.com/wp-json/trinitykit/v1/all-summaries-posts?bypass=true';
             // Realizar uma requisição HTTP para obter os dados dos livros
@@ -73,46 +78,69 @@
                     if (!response.ok) {
                         throw new Error('Erro ao obter os dados.');
                     }
+
                     // Parse do JSON
                     return response.json();
                 })
                 .then(data => {
-
-                    // console.log(">>>", data.posts)
                     const blockComponent = document.getElementById('block-books');
                     blockComponent.innerHTML = '';
-                    
-                    data.posts.forEach(post => {
-                        const postDiv = document.createElement('div');
 
-                        postDiv.classList.add('post-item');
+                    const searchInput = document.getElementById('search');
 
-                        const link = document.createElement('a');
-                        link.href = `/blog/${post.post_slug}`;
-                        link.target = "_blank";
+                    searchInput.addEventListener('input', function () {
+                        const searchTerm = this.value.toLowerCase();
 
-                        const image = document.createElement('img');
-                        image.src = post.book_cover_url;
-                        image.alt = post.book_name;
-                        image.classList.add('book-image');
+                        const filteredPosts = data.posts.filter(post => {
+                            const bookName = removeAccents(post.book_name.toLowerCase());
+                            const bookAuthor = removeAccents(post.book_author.toLowerCase());
+                            return bookName.includes(searchTerm) || bookAuthor.includes(searchTerm);
+                        });
 
-                        link.appendChild(image);
-
-                        postDiv.appendChild(link);
-
-                        const title = document.createElement('p');
-                        title.textContent = `"${post.book_name}", escrito por ${post.book_author}`;
-                        title.classList.add('book-title');
-                        link.appendChild(title);
-
-                        blockComponent.appendChild(postDiv);
+                        if (filteredPosts.length > 0) {
+                            renderBooks(filteredPosts);
+                        } else {
+                            blockComponent.innerHTML = '<span>Nenhum resultado encontrado.</span>';
+                        }
                     });
 
+                    renderBooks(data.posts);
                 })
                 .catch(error => {
                     console.error('Erro:', error);
                 });
         }
-        submitForm()
+
+        function renderBooks(posts) {
+            const blockComponent = document.getElementById('block-books');
+            blockComponent.innerHTML = '';
+
+            posts.forEach(post => {
+                const postDiv = document.createElement('div');
+                postDiv.classList.add('post-item');
+
+                const link = document.createElement('a');
+                link.href = `/blog/${post.post_slug}`;
+                link.target = "_blank";
+
+                const image = document.createElement('img');
+                image.src = post.book_cover_url;
+                image.alt = post.book_name;
+                image.classList.add('book-image');
+
+                link.appendChild(image);
+
+                postDiv.appendChild(link);
+
+                const title = document.createElement('p');
+                title.textContent = `"${post.book_name}", escrito por ${post.book_author}`;
+                title.classList.add('book-title');
+                link.appendChild(title);
+
+                blockComponent.appendChild(postDiv);
+            });
+        }
+
+        submitForm();
     </script>
 </div>
