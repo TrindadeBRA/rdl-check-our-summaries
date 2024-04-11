@@ -15,7 +15,7 @@
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
-        height: 400px;
+        max-height: 400px;
         overflow: scroll;
     }
 
@@ -45,9 +45,14 @@
     .dark .post-item .book-title {
         color: #fff !important;
     }
-    
+
     #search {
-        margin-bottom: 20PX;
+        margin: 0 auto 20px auto;
+        max-width: 500px;
+        width: 100%;
+        border-radius: 12px;
+        color: #000;
+        height: 40px;
     }
 
     @media only screen and (min-width: 769px) {
@@ -61,10 +66,6 @@
             display: none !important;
         }
 
-        #block-books {
-            height: unset!important;
-            overflow: auto!important;
-        }
     }
 </style>
 
@@ -110,7 +111,7 @@
                         if (filteredPosts.length > 0) {
                             renderBooks(filteredPosts);
                         } else {
-                            blockComponent.innerHTML = '<span>Nenhum resultado encontrado.</span>';
+                            blockComponent.innerHTML = '<p>Nenhum resultado encontrado.</p>';
                         }
                     });
 
